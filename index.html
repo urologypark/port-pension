@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>포트폴리오 비중 현황</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 잔고증명서처럼 위에서 아래로 읽는 단일 컬럼 원장(ledger). 요약 → 구조 → 계좌별 → 은퇴 시뮬레이션 순. */
+:root{
+  --bg:#F4F6F8; --surface:#FFFFFF; --surface-2:#EBEFF3; --line:#D6DDE4;
+  --ink:#121A22; --ink-2:#47535F; --muted:#7A8692;
+  --accent:#1D4E89; --accent-tint:#E2EBF6;
+  --good:#1B7F4B; --good-tint:#E3F3EA; --bad:#B8322A; --bad-tint:#FAE6E4; --warn:#9A6100; --warn-tint:#FBF0DA;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
+  --font-display:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font-body:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1419; --surface:#171E25; --surface-2:#1F2830; --line:#2C3843;
+  --ink:#E8EDF2; --ink-2:#B3BEC9; --muted:#85919C;
+  --accent:#7FB0EA; --accent-tint:#1C2D42;
+  --good:#5BC48A; --good-tint:#16301F; --bad:#EE7B72; --bad-tint:#3A1D1B; --warn:#E3AE4F; --warn-tint:#352812;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+  color-scheme:dark; }}
+:root[data-theme="dark"]{
+  --bg:#0F1419; --surface:#171E25; --surface-2:#1F2830; --line:#2C3843;
+  --ink:#E8EDF2; --ink-2:#B3BEC9; --muted:#85919C;
+  --accent:#7FB0EA; --accent-tint:#1C2D42;
+  --good:#5BC48A; --good-tint:#16301F; --bad:#EE7B72; --bad-tint:#3A1D1B; --warn:#E3AE4F; --warn-tint:#352812;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+  color-scheme:dark; }
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding-inline:16px;padding-block:28px 64px;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.3}
+h1{font-size:1.75rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;display:flex;align-items:baseline;gap:10px}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0}
+.num,.tnum{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;font-weight:500}
+.muted{color:var(--muted)} .ink2{color:var(--ink-2)}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+section{display:flex;flex-direction:column;gap:16px}
+.sec-head{display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.sec-head p{color:var(--ink-2);font-size:.92rem}
+
+/* 헤더: 증명서 상단 표 형식 */
+.cert{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.cert-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:20px;border-bottom:1px solid var(--line)}
+.cert-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.cert-grid>div{padding:14px 20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.cert-grid>div:last-child{border-right:0}
+.cert-grid .v{font-family:var(--font-num);font-size:1.25rem;font-weight:500}
+.cert-grid .k{font-size:.78rem;color:var(--muted)}
+.draft-chip{align-self:flex-start;font-size:.75rem;padding:3px 10px;border-radius:999px;background:var(--warn-tint);color:var(--warn);font-weight:500}
+@media (max-width:700px){.cert-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cert-grid>div:nth-child(2){border-right:0}.cert-grid>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+
+/* 핵심 진단 */
+.findings{display:grid;grid-template-columns:1fr;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.finding{display:grid;grid-template-columns:88px minmax(0,1fr);gap:14px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.finding:last-child{border-bottom:0}
+.sev{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;align-self:start;text-align:center}
+.sev.high{background:var(--bad-tint);color:var(--bad)} .sev.mid{background:var(--warn-tint);color:var(--warn)} .sev.ok{background:var(--good-tint);color:var(--good)}
+.finding b{display:block;margin-bottom:2px}
+.finding p{color:var(--ink-2);font-size:.92rem}
+
+/* 표 */
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-weight:500;color:var(--muted);font-size:.78rem;background:var(--surface-2);position:sticky;top:0}
+td:first-child,th:first-child{text-align:left}
+td.l,th.l{text-align:left}
+tr:last-child td{border-bottom:0}
+tfoot td{font-weight:700;background:var(--surface-2)}
+.tag{display:inline-block;font-size:.72rem;padding:1px 7px;border-radius:4px;background:var(--surface-2);color:var(--ink-2);margin-left:6px;font-family:var(--font-body)}
+.tag.q{background:var(--warn-tint);color:var(--warn)}
+
+/* 막대 */
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:grid;grid-template-columns:minmax(90px,170px) minmax(0,1fr) 120px;gap:10px;align-items:center;font-size:.86rem}
+.bar-row .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{height:14px;position:relative}
+.bar-fill{height:100%;border-radius:0 4px 4px 0;background:var(--s1);min-width:2px}
+.bar-row .val{text-align:right;font-family:var(--font-num);font-size:.82rem;color:var(--ink-2)}
+@media (max-width:520px){.bar-row{grid-template-columns:minmax(0,1fr) 92px}.bar-track{grid-column:1/-1;grid-row:2}}
+
+.stack{display:flex;height:28px;gap:2px;border-radius:4px;overflow:hidden}
+.stack>div{height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.84rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel .cap{font-size:.82rem;color:var(--muted)}
+
+/* 계좌 카드 */
+details.acct{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+details.acct>summary{list-style:none;cursor:pointer;padding:14px 18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:center}
+details.acct>summary::-webkit-details-marker{display:none}
+details.acct>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.acct-name{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.acct-no{font-family:var(--font-num);font-size:.8rem;color:var(--muted)}
+.acct-fig{text-align:right;font-family:var(--font-num)}
+.acct-fig .big{font-size:1.05rem;font-weight:500}
+.acct-fig .small{font-size:.8rem}
+.acct-mini{grid-column:1/-1;display:flex;height:6px;gap:2px;border-radius:3px;overflow:hidden;margin-top:6px}
+.acct-body{padding:0 18px 18px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:14px}
+.chev{transition:transform .2s;color:var(--muted);font-size:.8rem}
+details[open] .chev{transform:rotate(90deg)}
+.plan{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.plan{grid-template-columns:1fr}}
+.plan>div{background:var(--surface-2);border-radius:6px;padding:12px 14px;min-width:0}
+.plan ul{margin:6px 0 0;padding-left:18px;font-size:.9rem;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
+
+/* 시뮬레이터 */
+.sim{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px}
+@media (max-width:760px){.sim{grid-template-columns:1fr}}
+.ctrl{display:flex;flex-direction:column;gap:14px}
+.ctrl label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--ink-2)}
+.ctrl .row{display:flex;justify-content:space-between}
+.ctrl input[type=range]{width:100%;accent-color:var(--accent)}
+.out-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.out-tiles{grid-template-columns:1fr}}
+.tile{background:var(--surface-2);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile .v{font-family:var(--font-num);font-size:1.15rem;font-weight:500}
+.tile .k{font-size:.76rem;color:var(--muted)}
+svg text{fill:var(--muted);font-family:var(--font-num);font-size:11px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:.8rem;padding:6px 9px;border-radius:4px;z-index:10;max-width:260px;line-height:1.4}
+
+/* 타임라인 */
+.timeline{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.tl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:14px;padding:12px 18px;border-bottom:1px solid var(--line)}
+.tl:last-child{border-bottom:0}
+.tl .when{font-family:var(--font-num);font-size:.85rem}
+.tl .when small{display:block;color:var(--muted);font-family:var(--font-body)}
+.tl p{font-size:.9rem;color:var(--ink-2)}
+.tl.now{background:var(--accent-tint)}
+
+.todo{background:var(--surface);border:1px dashed var(--line);border-radius:6px;padding:14px 18px}
+.todo ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.92rem;color:var(--ink-2)}
+footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* 탭·폼 */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:.85rem;padding:6px 14px;border:0;background:transparent;color:var(--ink-2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.seg button:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+select,input[type=text],input[type=number],input[type=date]{font:inherit;font-size:.88rem;padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);min-width:0;width:100%}
+.form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.form label{display:flex;flex-direction:column;gap:3px;font-size:.78rem;color:var(--muted);min-width:0}
+.form .wide{grid-column:span 2}
+@media (max-width:700px){.form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.btn{font:inherit;font-size:.85rem;padding:7px 14px;border-radius:4px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.csv-out{font-family:var(--font-num);font-size:.82rem;background:var(--surface-2);padding:10px 12px;border-radius:4px;overflow-x:auto;white-space:pre;user-select:all;min-height:2.4em}
+.warn-box{background:var(--warn-tint);color:var(--warn);border-radius:6px;padding:10px 14px;font-size:.88rem}
+.warn-box ul{margin:4px 0 0;padding-left:18px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.note{font-size:.84rem;color:var(--ink-2);background:var(--surface-2);border-radius:6px;padding:10px 14px}
+.strategy{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.strategy{grid-template-columns:1fr}}
+.strategy>div{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.strategy .when-chip{align-self:flex-start;font-size:.72rem;padding:2px 8px;border-radius:4px;background:var(--accent-tint);color:var(--accent);font-weight:500}
+.strategy p{font-size:.9rem;color:var(--ink-2)}
+.strategy .gain{font-family:var(--font-num);font-size:.85rem;color:var(--good)}
+details.plain>summary{cursor:pointer;color:var(--accent);font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="cert">
+    <div class="cert-top">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <span class="eyebrow">평가일 <span id="asof"></span> · 종가 <span id="pxd"></span></span>
+        <h1>포트폴리오 비중 현황</h1>
+        <p class="ink2" style="font-size:.92rem">계좌·자산군·종목의 비중과 수익률만 공개합니다. 금액은 싣지 않습니다.</p>
+      </div>
+    </div>
+    <div class="cert-grid">
+      <div><span class="k">주식</span><span class="v" id="k-eq"></span></div>
+      <div><span class="k">채권·현금성</span><span class="v" id="k-safe"></span></div>
+      <div><span class="k">해외 주식(주식 중)</span><span class="v" id="k-intl"></span></div>
+      <div><span class="k">기준일 이후 수익률</span><span class="v" id="k-ret"></span></div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><h2>수익률 추이</h2><p>기준일을 100으로 놓은 지수입니다. 입금·출금은 빼고 계산합니다.</p></div>
+    <div class="panel">
+      <div class="toolbar"><div class="seg" role="group" aria-label="기간 단위" id="period-seg">
+        <button type="button" data-p="day" aria-pressed="true">일별</button><button type="button" data-p="week" aria-pressed="false">주별</button><button type="button" data-p="month" aria-pressed="false">월별</button><button type="button" data-p="year" aria-pressed="false">년별</button></div></div>
+      <div style="overflow-x:auto"><svg id="trend-chart" viewBox="0 0 640 220" style="width:100%;min-width:420px;height:auto" role="img" aria-label="수익률 지수 추이"></svg></div>
+      <p class="cap" id="trend-empty"></p>
+      <div class="tbl-wrap"><table id="trend-table"></table></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>계좌별 비중</h2><p>전체 대비 비중과 계좌 수익률(원금 또는 매입금액 대비).</p></div>
+    <div class="tbl-wrap"><table id="acct-table"></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>포트폴리오 구조</h2><p>ETF·펀드는 구성종목·자산군으로 풀어서 합산했습니다.</p></div>
+    <div class="panel"><h3>자산군 배분</h3><div class="stack" id="mix-stack" role="img" aria-label="자산군 배분"></div><div class="legend" id="mix-legend"></div></div>
+    <div class="grid2">
+      <div class="panel"><h3>주식 지역 분산</h3><div class="bars" id="region-bars"></div></div>
+      <div class="panel"><h3>통화 노출</h3><div class="bars" id="fx-bars"></div></div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h3>실질 보유 종목 TOP 15</h3><div class="bars" id="look-bars"></div><p class="cap">직접 보유 + ETF 안에 들어있는 몫.</p></div>
+      <div class="panel"><h3>테마·섹터 TOP 15</h3><div class="bars" id="theme-bars"></div></div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h3>세제 구조별 비중</h3><div class="bars" id="wrap-bars"></div></div>
+      <div class="panel"><h3>여러 계좌에 나뉜 상품</h3><div class="tbl-wrap" style="border:0"><table id="dup-table"></table></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>계좌별 보유 종목</h2><p>계좌를 누르면 종목별 계좌 내 비중과 수익률이 열립니다.</p></div>
+    <div id="accts" style="display:flex;flex-direction:column;gap:10px"></div>
+  </section>
+
+  <footer>
+    <p>장 마감 종가로 매 거래일 자동 갱신됩니다. ETF 구성종목 비중은 운용사 공시 기반 근사치입니다. 개인 기록용이며 투자 권유가 아닙니다.</p>
+  </footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+<script>
+const D = {"date": "2026-10-13", "price_date": "2026-10-13", "accounts": [{"type": "금현물계좌", "broker": "미래에셋증권", "wrap": "과세(금 비과세)", "weight": 0.034, "ret": -0.1585, "mix": {"alt": 0.9923, "cash": 0.0077}, "risk_ratio": null, "holdings": [{"name": "금 현물 99.99_1kg", "code": "M04020000", "theme": "금", "w": 0.9923, "ret": -0.1595, "maturity": null}, {"name": "예수금", "code": null, "theme": "현금성", "w": 0.0077, "ret": null, "maturity": null}]}, {"type": "종합위탁(CMA)", "broker": "미래에셋증권", "wrap": "과세", "weight": 0.3493, "ret": 1.838, "mix": {"equity": 0.9769, "alt": 0.0186, "cash": 0.0045}, "risk_ratio": null, "holdings": [{"name": "삼성전자", "code": "005930", "theme": "반도체", "w": 0.3238, "ret": 3.3504, "maturity": null}, {"name": "SK하이닉스", "code": "000660", "theme": "반도체", "w": 0.2166, "ret": 20.834, "maturity": null}, {"name": "TIGER 미국나스닥100", "code": "133690", "theme": "미국 대형 성장", "w": 0.1694, "ret": 2.1493, "maturity": null}, {"name": "TIGER 200", "code": "102110", "theme": "국내 대형 지수", "w": 0.0691, "ret": 2.6861, "maturity": null}, {"name": "SPDR S&P 500 TRUST (SPY)", "code": "SPY", "theme": "미국 시장 전체", "w": 0.0326, "ret": 0.1252, "maturity": null}, {"name": "현대차", "code": "005380", "theme": "자동차", "w": 0.031, "ret": 0.6597, "maturity": null}, {"name": "POSCO홀딩스", "code": "005490", "theme": "소재/2차전지", "w": 0.0281, "ret": 0.6221, "maturity": null}, {"name": "맥쿼리인프라", "code": "088980", "theme": "인프라/리츠", "w": 0.0186, "ret": -0.135, "maturity": null}, {"name": "메가스터디교육", "code": "215200", "theme": "교육", "w": 0.0165, "ret": -0.2466, "maturity": null}, {"name": "삼성증권", "code": "016360", "theme": "금융", "w": 0.0146, "ret": 1.6234, "maturity": null}, {"name": "셀트리온", "code": "068270", "theme": "바이오", "w": 0.0136, "ret": 0.4386, "maturity": null}, {"name": "SCHWAB US DIVIDEND EQUITY (SCHD)", "code": "SCHD", "theme": "미국 배당", "w": 0.0131, "ret": 0.2455, "maturity": null}, {"name": "TIGER 200 에너지화학", "code": "139250", "theme": "에너지/화학", "w": 0.0113, "ret": 0.2028, "maturity": null}, {"name": "RISE 대형고배당10TR", "code": "315960", "theme": "국내 고배당", "w": 0.0066, "ret": 0.0504, "maturity": null}, {"name": "ISHARES RUSSELL 2000 (IWM)", "code": "IWM", "theme": "미국 소형주", "w": 0.0058, "ret": 0.3255, "maturity": null}, {"name": "ISHARES US MEDICAL DEVICES (IHI)", "code": "IHI", "theme": "의료기기", "w": 0.0053, "ret": -0.0585, "maturity": null}, {"name": "GLOBAL X URANIUM (URA)", "code": "URA", "theme": "우라늄/원자력", "w": 0.0048, "ret": -0.296, "maturity": null}, {"name": "VANGUARD 0-3M TREASURY BILL (VBIL)", "code": "VBIL", "theme": "미국 단기국채(현금성)", "w": 0.0041, "ret": -0.0079, "maturity": null}, {"name": "효성티앤씨", "code": "298020", "theme": "화학", "w": 0.0034, "ret": 0.0248, "maturity": null}, {"name": "VANGUARD TOTAL WORLD STOCK (VT)", "code": "VT", "theme": "글로벌 전체", "w": 0.0033, "ret": 0.1441, "maturity": null}, {"name": "LG화학우", "code": "051915", "theme": "화학", "w": 0.0033, "ret": -0.6432, "maturity": null}, {"name": "TIGER 글로벌리튬&2차전지SOLACTIVE(합성)", "code": "394670", "theme": "2차전지", "w": 0.0029, "ret": -0.0867, "maturity": null}, {"name": "이지케어텍", "code": "099750", "theme": "헬스케어", "w": 0.0012, "ret": -0.6222, "maturity": null}, {"name": "카카오", "code": "035720", "theme": "인터넷", "w": 0.0008, "ret": -0.7407, "maturity": null}, {"name": "예수금(외화 포함)", "code": null, "theme": "현금성", "w": 0.0004, "ret": null, "maturity": null}, {"name": "CMA RP", "code": null, "theme": "현금성", "w": 0.0, "ret": 0.0, "maturity": null}]}, {"type": "개인형 IRP", "broker": "미래에셋증권", "wrap": "연금", "weight": 0.0616, "ret": 0.4563, "mix": {"alt": 0.0847, "equity": 0.7866, "bond": 0.1284, "cash": 0.0003}, "risk_ratio": 0.6643, "holdings": [{"name": "TIGER 미국나스닥100", "code": "133690", "theme": "미국 대형 성장", "w": 0.2571, "ret": 0.7555, "maturity": null}, {"name": "TIGER TDF2045", "code": "0025N0", "theme": "TDF (2045 은퇴)", "w": 0.2199, "ret": 0.0167, "maturity": null}, {"name": "KODEX 코리아배당성장", "code": "211900", "theme": "국내 배당성장", "w": 0.1856, "ret": 0.2019, "maturity": null}, {"name": "맥쿼리인프라", "code": "088980", "theme": "인프라/리츠", "w": 0.0847, "ret": -0.2185, "maturity": null}, {"name": "KODEX AI전력핵심설비", "code": "487240", "theme": "AI 전력설비", "w": 0.0697, "ret": 0.2006, "maturity": null}, {"name": "SOL 미국배당미국채혼합50", "code": "490490", "theme": "미국배당+미국채 혼합", "w": 0.0545, "ret": -0.0549, "maturity": null}, {"name": "디폴트옵션 중립투자형 포트폴리오2", "code": null, "theme": "디폴트옵션(중립)", "w": 0.0473, "ret": 0.4918, "maturity": null}, {"name": "미래에셋미국인덱스EMP(주식-재간접)", "code": null, "theme": "미국 시장 전체", "w": 0.0267, "ret": 0.4872, "maturity": null}, {"name": "피델리티글로벌배당인컴(주식-재간접)", "code": null, "theme": "글로벌 배당", "w": 0.0218, "ret": 0.2192, "maturity": null}, {"name": "피델리티글로벌테크놀로지(주식-재간접)", "code": null, "theme": "글로벌 기술", "w": 0.0123, "ret": 0.5003, "maturity": null}, {"name": "미래에셋전략배분TDF2025(혼합)", "code": null, "theme": "TDF (2025 은퇴)", "w": 0.0078, "ret": 0.2655, "maturity": null}, {"name": "피델리티글로벌금융주(주식-재간접)", "code": null, "theme": "글로벌 금융", "w": 0.0059, "ret": 0.1994, "maturity": null}, {"name": "디폴트옵션 적극투자형 TDF1", "code": null, "theme": "디폴트옵션(적극)", "w": 0.0033, "ret": 0.5284, "maturity": null}, {"name": "RISE TDF2050액티브", "code": "442570", "theme": "TDF (2050 은퇴)", "w": 0.0025, "ret": 0.0645, "maturity": null}, {"name": "RISE 고배당", "code": "266160", "theme": "국내 고배당", "w": 0.0006, "ret": -0.0111, "maturity": null}, {"name": "예수금", "code": null, "theme": "현금성", "w": 0.0003, "ret": null, "maturity": null}, {"name": "교보 이율보증형보험 3년(DC/IRP)", "code": null, "theme": "원리금보장", "w": 0.0001, "ret": 0.082, "maturity": null}]}, {"type": "중개형 ISA", "broker": "미래에셋증권", "wrap": "ISA", "weight": 0.1201, "ret": 0.3356, "mix": {"equity": 0.8657, "alt": 0.0585, "bond": 0.0472, "cash": 0.0287}, "risk_ratio": null, "holdings": [{"name": "KODEX AI전력핵심설비", "code": "487240", "theme": "AI 전력설비", "w": 0.1655, "ret": 1.1021, "maturity": null}, {"name": "삼성전자", "code": "005930", "theme": "반도체", "w": 0.142, "ret": 3.4662, "maturity": null}, {"name": "RISE 200채권혼합50", "code": "183700", "theme": "주식·채권 혼합", "w": 0.0944, "ret": 0.2053, "maturity": null}, {"name": "TIGER 은행고배당플러스TOP10", "code": "466940", "theme": "은행/금융 배당", "w": 0.0843, "ret": 0.8468, "maturity": null}, {"name": "HANARO 원자력iSelect", "code": "434730", "theme": "원자력", "w": 0.0684, "ret": 0.0651, "maturity": null}, {"name": "PLUS K방산", "code": "449450", "theme": "방산", "w": 0.0658, "ret": 0.1367, "maturity": null}, {"name": "하나금융지주", "code": "086790", "theme": "금융", "w": 0.0632, "ret": 0.6839, "maturity": null}, {"name": "KODEX 코리아배당성장", "code": "211900", "theme": "국내 배당성장", "w": 0.0556, "ret": 0.2403, "maturity": null}, {"name": "신한알파리츠", "code": "293940", "theme": "인프라/리츠", "w": 0.0503, "ret": -0.1286, "maturity": null}, {"name": "TIGER 미국나스닥100", "code": "133690", "theme": "미국 대형 성장", "w": 0.0401, "ret": 0.1373, "maturity": null}, {"name": "TIGER 차이나휴머노이드로봇", "code": "0053L0", "theme": "휴머노이드/로봇", "w": 0.0302, "ret": -0.3964, "maturity": null}, {"name": "예수금", "code": null, "theme": "현금성", "w": 0.0287, "ret": null, "maturity": null}, {"name": "1Q 미국우주항공테크", "code": "0131V0", "theme": "우주항공", "w": 0.0199, "ret": -0.2781, "maturity": null}, {"name": "TIGER 200 IT", "code": "139260", "theme": "반도체/IT", "w": 0.0181, "ret": 0.0036, "maturity": null}, {"name": "TIGER 200", "code": "102110", "theme": "국내 대형 지수", "w": 0.0149, "ret": 0.1258, "maturity": null}, {"name": "KODEX 코스닥150", "code": "229200", "theme": "중소형 성장", "w": 0.0093, "ret": -0.2573, "maturity": null}, {"name": "TIGER 조선TOP10", "code": "494670", "theme": "조선", "w": 0.0086, "ret": -0.339, "maturity": null}, {"name": "RISE 대형고배당10TR", "code": "315960", "theme": "국내 고배당", "w": 0.0085, "ret": -0.0041, "maturity": null}, {"name": "맥쿼리인프라", "code": "088980", "theme": "인프라/리츠", "w": 0.0082, "ret": -0.0856, "maturity": null}, {"name": "POSCO홀딩스", "code": "005490", "theme": "소재/2차전지", "w": 0.0082, "ret": -0.2, "maturity": null}, {"name": "레이저옵텍", "code": "199550", "theme": "헬스케어", "w": 0.0075, "ret": -0.4938, "maturity": null}, {"name": "TIGER 인도니프티50", "code": "453870", "theme": "인도", "w": 0.007, "ret": -0.2335, "maturity": null}, {"name": "TIGER 차이나항셍테크", "code": "371160", "theme": "중국 기술주", "w": 0.0012, "ret": -0.3579, "maturity": null}]}, {"type": "연금저축 (연금보험 이전)", "broker": "미래에셋증권", "wrap": "연금", "weight": 0.0772, "ret": 0.0138, "mix": {"equity": 0.8637, "bond": 0.0711, "cash": 0.0652}, "risk_ratio": null, "holdings": [{"name": "KODEX 미국나스닥100", "code": "379810", "theme": "미국 대형 성장", "w": 0.2851, "ret": 0.0499, "maturity": null}, {"name": "RISE 삼성전자SK하이닉스채권혼합50", "code": "0162Z0", "theme": "반도체2종+국채", "w": 0.1421, "ret": 0.0035, "maturity": null}, {"name": "TIGER 200", "code": "102110", "theme": "국내 대형 지수", "w": 0.1389, "ret": 0.2353, "maturity": null}, {"name": "KODEX 코리아배당성장", "code": "211900", "theme": "국내 배당성장", "w": 0.1292, "ret": -0.0876, "maturity": null}, {"name": "TIGER 미국S&P500", "code": "360750", "theme": "미국 시장 전체", "w": 0.0833, "ret": -0.0606, "maturity": null}, {"name": "TIGER 미국배당다우존스", "code": "458730", "theme": "미국 배당", "w": 0.0821, "ret": -0.0848, "maturity": null}, {"name": "예수금", "code": null, "theme": "현금성", "w": 0.0652, "ret": null, "maturity": null}, {"name": "RISE 대형고배당10TR", "code": "315960", "theme": "국내 고배당", "w": 0.0532, "ret": -0.0461, "maturity": null}, {"name": "TIGER 일본니케이225", "code": "241180", "theme": "일본 대형", "w": 0.017, "ret": 0.201, "maturity": null}, {"name": "HANARO 증권고배당TOP3플러스", "code": "0111J0", "theme": "증권 배당", "w": 0.0039, "ret": -0.4287, "maturity": null}]}, {"type": "연금저축 (세액공제)", "broker": "미래에셋증권", "wrap": "연금", "weight": 0.0148, "ret": 0.1121, "mix": {"equity": 0.7837, "bond": 0.1843, "alt": 0.0316, "cash": 0.0004}, "risk_ratio": null, "holdings": [{"name": "TIGER TDF2045", "code": "0025N0", "theme": "TDF (2045 은퇴)", "w": 0.4561, "ret": 0.0685, "maturity": null}, {"name": "KODEX 코리아배당성장", "code": "211900", "theme": "국내 배당성장", "w": 0.1888, "ret": 0.4047, "maturity": null}, {"name": "RISE 삼성전자SK하이닉스채권혼합50", "code": "0162Z0", "theme": "반도체2종+국채", "w": 0.0926, "ret": -0.0171, "maturity": null}, {"name": "TIGER 일본니케이225", "code": "241180", "theme": "일본 대형", "w": 0.0912, "ret": 0.2199, "maturity": null}, {"name": "KODEX 미국배당커버드콜액티브", "code": "441640", "theme": "미국 배당+커버드콜", "w": 0.082, "ret": -0.0169, "maturity": null}, {"name": "TIGER 미국S&P500동일가중", "code": "488500", "theme": "미국 시장 전체(동일가중)", "w": 0.0525, "ret": 0.1742, "maturity": null}, {"name": "맥쿼리인프라", "code": "088980", "theme": "인프라/리츠", "w": 0.0316, "ret": -0.122, "maturity": null}, {"name": "KODEX TDF2050액티브", "code": "434060", "theme": "TDF (2050 은퇴)", "w": 0.0049, "ret": 0.0821, "maturity": null}, {"name": "예수금", "code": null, "theme": "현금성", "w": 0.0004, "ret": null, "maturity": null}]}, {"type": "일반 위탁계좌", "broker": "미래에셋증권", "wrap": "과세", "weight": 0.0724, "ret": -0.0223, "mix": {"equity": 0.1512, "bond": 0.2703, "cash": 0.5785}, "risk_ratio": null, "holdings": [{"name": "TIGER CD금리플러스액티브(합성)", "code": "499660", "theme": "CD금리(현금성)", "w": 0.3485, "ret": 0.0, "maturity": null}, {"name": "예수금", "code": null, "theme": "현금성", "w": 0.2301, "ret": null, "maturity": null}, {"name": "SOL 국고채3년", "code": "438560", "theme": "국채 단기", "w": 0.1907, "ret": 0.0035, "maturity": null}, {"name": "RISE 200채권혼합50", "code": "183700", "theme": "주식·채권 혼합", "w": 0.1053, "ret": 0.005, "maturity": null}, {"name": "RISE 삼성전자SK하이닉스채권혼합50", "code": "0162Z0", "theme": "반도체2종+국채", "w": 0.0507, "ret": -0.0133, "maturity": null}, {"name": "1Q 미국우주항공테크", "code": "0131V0", "theme": "우주항공", "w": 0.0437, "ret": -0.2776, "maturity": null}, {"name": "RISE 대형고배당10TR", "code": "315960", "theme": "국내 고배당", "w": 0.0294, "ret": -0.1805, "maturity": null}, {"name": "KODEX 국고채10년액티브", "code": "471230", "theme": "국채 장기", "w": 0.0016, "ret": -0.0121, "maturity": null}]}, {"type": "개인투자용국채 전용계좌", "broker": "미래에셋증권", "wrap": "분리과세 국채", "weight": 0.0203, "ret": 0.0679, "mix": {"bond": 1.0, "cash": 0.0}, "risk_ratio": null, "holdings": [{"name": "개인투자용국채 03275-3407", "code": null, "theme": "개인투자용국채", "w": 0.395, "ret": 0.0731, "maturity": "2034-07"}, {"name": "개인투자용국채 03540-3406", "code": null, "theme": "개인투자용국채", "w": 0.205, "ret": 0.082, "maturity": "2034-06"}, {"name": "개인투자용국채 03185-3408", "code": null, "theme": "개인투자용국채", "w": 0.1735, "ret": 0.0684, "maturity": "2034-08"}, {"name": "개인투자용국채 03000-3410", "code": null, "theme": "개인투자용국채", "w": 0.0573, "ret": 0.0594, "maturity": "2034-10"}, {"name": "개인투자용국채 03050-3411", "code": null, "theme": "개인투자용국채", "w": 0.0573, "ret": 0.0578, "maturity": "2034-11"}, {"name": "개인투자용국채 02665-3501", "code": null, "theme": "개인투자용국채", "w": 0.0566, "ret": 0.0461, "maturity": "2035-01"}, {"name": "개인투자용국채 03710-3603", "code": null, "theme": "개인투자용국채", "w": 0.0553, "ret": 0.021, "maturity": "2036-03"}, {"name": "예수금", "code": null, "theme": "현금성", "w": 0.0, "ret": null, "maturity": null}]}, {"type": "퇴직연금 IRP (퇴직금 전환)", "broker": "삼성증권", "wrap": "연금", "weight": 0.2203, "ret": 0.2205, "mix": {"alt": 0.1345, "equity": 0.7694, "bond": 0.0956, "cash": 0.0006}, "risk_ratio": 0.6809, "holdings": [{"name": "TIGER TDF2045", "code": "0025N0", "theme": "TDF (2045 은퇴)", "w": 0.3185, "ret": 0.1268, "maturity": null}, {"name": "TIGER 미국나스닥100", "code": "133690", "theme": "미국 대형 성장", "w": 0.2895, "ret": 0.2482, "maturity": null}, {"name": "KODEX 코리아배당성장", "code": "211900", "theme": "국내 배당성장", "w": 0.2214, "ret": 0.2297, "maturity": null}, {"name": "맥쿼리인프라", "code": "088980", "theme": "인프라/리츠", "w": 0.1345, "ret": -0.1425, "maturity": null}, {"name": "TIGER 200", "code": "102110", "theme": "국내 대형 지수", "w": 0.0269, "ret": 0.2105, "maturity": null}, {"name": "RISE 대형고배당10TR", "code": "315960", "theme": "국내 고배당", "w": 0.0086, "ret": -0.0058, "maturity": null}, {"name": "단기상품", "code": null, "theme": "현금성", "w": 0.0005, "ret": 0.0, "maturity": null}, {"name": "예수금", "code": null, "theme": "현금성", "w": 0.0002, "ret": null, "maturity": null}]}, {"type": "연금저축 (세액공제 미적용)", "broker": "삼성증권", "wrap": "연금", "weight": 0.0134, "ret": 0.0214, "mix": {"equity": 0.7806, "alt": 0.1377, "bond": 0.0818}, "risk_ratio": null, "holdings": [{"name": "RISE 대형고배당10TR", "code": "315960", "theme": "국내 고배당", "w": 0.3064, "ret": -0.0138, "maturity": null}, {"name": "TIGER 200", "code": "102110", "theme": "국내 대형 지수", "w": 0.2833, "ret": 0.1524, "maturity": null}, {"name": "TIGER TDF2045", "code": "0025N0", "theme": "TDF (2045 은퇴)", "w": 0.2726, "ret": 0.0459, "maturity": null}, {"name": "ACE KRX금현물", "code": "411060", "theme": "금", "w": 0.1377, "ret": -0.1493, "maturity": null}]}, {"type": "개인연금신탁 (2009 가입)", "broker": "기타", "wrap": "연금", "weight": 0.0164, "ret": 0.0, "mix": {"bond": 1.0}, "risk_ratio": null, "holdings": [{"name": "개인연금신탁(2009)", "code": null, "theme": "개인연금신탁", "w": 1.0, "ret": 0.0, "maturity": null}]}], "mix": {"alt": 0.0844, "cash": 0.0524, "equity": 0.7629, "bond": 0.1002}, "region": {"KR": 0.6196, "US": 0.2769, "GL": 0.094, "CN": 0.005, "IN": 0.0011, "JP": 0.0035}, "fx": {"KRW": 0.679, "USD": 0.3137, "CNY": 0.0036, "JPY": 0.0027}, "theme": [["반도체", 0.2058], ["미국 대형 성장", 0.1656], ["TDF (2045 은퇴)", 0.0942], ["국내 배당성장", 0.0797], ["인프라/리츠", 0.0488], ["국내 대형 지수", 0.0464], ["금", 0.0356], ["현금성", 0.0257], ["CD금리(현금성)", 0.0252], ["AI 전력설비", 0.0242], ["개인투자용국채", 0.0203], ["미국 시장 전체", 0.0194], ["주식·채권 혼합", 0.019], ["개인연금신탁", 0.0164], ["반도체2종+국채", 0.016]], "wrap": {"과세(금 비과세)": 0.034, "과세": 0.4217, "연금": 0.4039, "ISA": 0.1201, "분리과세 국채": 0.0203, "공제회": 0.0}, "look": [["삼성전자", 0.1674], ["SK하이닉스", 0.1057], ["현대차", 0.0175], ["엔비디아", 0.0164], ["마이크로소프트", 0.0145], ["애플", 0.0145], ["POSCO홀딩스", 0.0108], ["하나금융지주", 0.0107], ["알파벳", 0.0107], ["아마존", 0.0098], ["브로드컴", 0.0087], ["KB금융", 0.0076], ["메타", 0.0063], ["메가스터디교육", 0.0058], ["HD현대일렉트릭", 0.0057]], "dups": [["TIGER 미국나스닥100", 4], ["TIGER TDF2045", 4], ["KODEX 코리아배당성장", 5], ["TIGER 200", 5], ["맥쿼리인프라", 5], ["RISE 삼성전자SK하이닉스채권혼합50", 3], ["RISE 대형고배당10TR", 6]], "index": [{"date": "2026-10-10", "v": 100.0}, {"date": "2026-10-12", "v": 98.2193}, {"date": "2026-10-13", "v": 98.2037}]};
+const pct=(v,d=1)=>(v*100).toFixed(d)+'%';
+const sgn=v=>v>0?'pos':v<0?'neg':'';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=id=>document.getElementById(id); const tip=$('tip');
+function bindTip(el,html){el.addEventListener('mousemove',e=>{tip.innerHTML=html;tip.hidden=false;tip.style.left=Math.min(e.clientX+12,innerWidth-270)+'px';tip.style.top=(e.clientY+12)+'px'});el.addEventListener('mouseleave',()=>tip.hidden=true)}
+const MIXC={equity:'var(--s1)',bond:'var(--s3)',cash:'var(--s4)',alt:'var(--s2)'}, MIXN={equity:'주식',bond:'채권',cash:'현금성',alt:'대체(금·인프라·리츠)'}, ORD=['equity','bond','cash','alt'];
+$('asof').textContent=D.date; $('pxd').textContent=D.price_date||'-';
+$('k-eq').textContent=pct(D.mix.equity||0); $('k-safe').textContent=pct((D.mix.bond||0)+(D.mix.cash||0));
+$('k-intl').textContent=pct(1-(D.region.KR||0));
+const last=D.index[D.index.length-1].v/100-1; $('k-ret').innerHTML=`<span class="${sgn(last)}">${pct(last,2)}</span>`;
+
+/* 추이 */
+let period='day';
+function pkey(d,p){if(p==='day')return d;if(p==='month')return d.slice(0,7);if(p==='year')return d.slice(0,4);const t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-(t.getUTCDay()+6)%7);return t.toISOString().slice(0,10)}
+function plabel(k,p){return p==='week'?k+' 주':p==='month'?k.replace('-','년 ')+'월':p==='year'?k+'년':k}
+function drawTrend(){
+  const H=D.index, groups=[]; for(const h of H){const k=pkey(h.date,period);const g=groups[groups.length-1];if(g&&g.k===k)g.h=h;else groups.push({k,h})}
+  const rows=groups.map((g,i)=>{const prev=i?groups[i-1].h:(g.h!==H[0]?H[0]:null);return {k:g.k,v:g.h.v,ret:prev?g.h.v/prev.v-1:null}});
+  $('trend-table').innerHTML='<thead><tr><th class="l">기간</th><th>지수</th><th>기간 수익률</th><th>누적</th></tr></thead><tbody>'+rows.slice().reverse().map(r=>`<tr><td>${plabel(r.k,period)}</td><td class="num">${r.v.toFixed(2)}</td><td class="num ${sgn(r.ret)}">${r.ret==null?'기준':pct(r.ret,2)}</td><td class="num ${sgn(r.v-100)}">${pct(r.v/100-1,2)}</td></tr>`).join('')+'</tbody>';
+  $('trend-empty').textContent=H.length<2?'기준일 하루치만 있습니다. 매 거래일 장 마감 후 자동으로 쌓입니다.':'';
+  const W=640,Hh=220,L=56,R=16,T=12,B=28; let lo=Math.min(...rows.map(r=>r.v)),hi=Math.max(...rows.map(r=>r.v)); if(hi===lo){lo-=1;hi+=1} const pad=(hi-lo)*.1; lo-=pad; hi+=pad;
+  const x=i=>rows.length<2?(L+W-R)/2:L+(W-L-R)*i/(rows.length-1), y=v=>T+(Hh-T-B)*(1-(v-lo)/(hi-lo));
+  let g=''; for(let j=0;j<=4;j++){const v=lo+(hi-lo)*j/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end">${v.toFixed(1)}</text>`}
+  const lab=Math.max(1,Math.ceil(rows.length/6)); rows.forEach((r,i)=>{const e=i===rows.length-1;if((i%lab===0&&rows.length-1-i>=lab/2)||e)g+=`<text x="${x(i)}" y="${Hh-8}" text-anchor="${e&&rows.length>1?'end':'middle'}">${period==='day'||period==='week'?r.k.slice(5):r.k}</text>`});
+  if(rows.length>1){const d=rows.map((r,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(r.v).toFixed(1)).join(' ');g+=`<line x1="${L}" x2="${W-R}" y1="${y(100)}" y2="${y(100)}" stroke="var(--muted)" stroke-dasharray="3 3"/><path d="${d}" fill="none" stroke="var(--s1)" stroke-width="2"/>`}
+  g+=`<circle cx="${x(rows.length-1)}" cy="${y(rows[rows.length-1].v)}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>`;
+  rows.forEach((r,i)=>{const w=(W-L-R)/Math.max(rows.length,1);g+=`<rect data-i="${i}" x="${x(i)-w/2}" y="${T}" width="${w}" height="${Hh-T-B}" fill="transparent"/>`});
+  const svg=$('trend-chart'); svg.innerHTML=g; svg.querySelectorAll('rect[data-i]').forEach(el=>{const r=rows[+el.dataset.i];bindTip(el,`<b>${plabel(r.k,period)}</b><br>지수 ${r.v.toFixed(2)}`+(r.ret!=null?`<br>기간 ${pct(r.ret,2)}`:''))});
+}
+$('period-seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;period=b.dataset.p;$('period-seg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));drawTrend()});
+
+/* 계좌 */
+$('acct-table').innerHTML='<thead><tr><th class="l">증권사</th><th class="l">계좌 유형</th><th class="l">세제</th><th>비중</th><th>수익률</th></tr></thead><tbody>'+D.accounts.map(a=>`<tr><td>${esc(a.broker)}</td><td class="l">${esc(a.type)}</td><td class="l"><span class="tag" style="margin:0">${esc(a.wrap)}</span></td><td class="num">${pct(a.weight)}</td><td class="num ${sgn(a.ret)}">${pct(a.ret)}</td></tr>`).join('')+'</tbody>';
+$('mix-stack').innerHTML=ORD.filter(k=>D.mix[k]).map(k=>`<div data-k="${k}" style="flex:${D.mix[k]};background:${MIXC[k]}"></div>`).join('');
+$('mix-stack').querySelectorAll('div').forEach(el=>bindTip(el,`${MIXN[el.dataset.k]} ${pct(D.mix[el.dataset.k])}`));
+$('mix-legend').innerHTML=ORD.filter(k=>D.mix[k]).map(k=>`<span><i style="background:${MIXC[k]}"></i>${MIXN[k]} <b class="num">${pct(D.mix[k])}</b></span>`).join('');
+function bars(id,items,color='var(--s1)'){const max=Math.max(...items.map(x=>x[1]));$(id).innerHTML=items.map(([n,v])=>`<div class="bar-row"><span class="lab" title="${esc(n)}">${esc(n)}</span><div class="bar-track"><div class="bar-fill" style="width:${v/max*100}%;background:${color}"></div></div><span class="val">${pct(v)}</span></div>`).join('')}
+const RN={KR:'한국',US:'미국',GL:'글로벌/기타',CN:'중국',JP:'일본',IN:'인도'}, FXN={KRW:'원화',USD:'미국 달러',CNY:'위안',HKD:'홍콩 달러',INR:'루피',JPY:'엔'};
+bars('region-bars',Object.entries(D.region).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[RN[k]||k,v]));
+bars('fx-bars',Object.entries(D.fx).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[FXN[k]||k,v]),'var(--s7)');
+bars('look-bars',D.look); bars('theme-bars',D.theme,'var(--s3)');
+bars('wrap-bars',Object.entries(D.wrap).sort((a,b)=>b[1]-a[1]),'var(--s7)');
+$('dup-table').innerHTML='<thead><tr><th class="l">상품</th><th>계좌 수</th></tr></thead><tbody>'+D.dups.map(([n,c])=>`<tr><td>${esc(n)}</td><td class="num">${c}</td></tr>`).join('')+'</tbody>';
+$('accts').innerHTML=D.accounts.map(a=>{const mk=ORD.filter(k=>a.mix[k]);return `<details class="acct"><summary>
+  <div class="acct-name"><span class="chev">▶</span><h3>${esc(a.type)}</h3><span class="acct-no">${esc(a.broker)}${a.risk_ratio!=null?' · 위험자산 '+pct(a.risk_ratio):''}</span></div>
+  <div class="acct-fig"><div class="big">${pct(a.weight)}</div><div class="small ${sgn(a.ret)}">${pct(a.ret)}</div></div>
+  <div class="acct-mini">${mk.map(k=>`<div style="flex:${a.mix[k]};background:${MIXC[k]}"></div>`).join('')}</div></summary>
+  <div class="acct-body"><div class="legend">${mk.map(k=>`<span><i style="background:${MIXC[k]}"></i>${MIXN[k]} ${pct(a.mix[k],0)}</span>`).join('')}</div>
+  <div class="tbl-wrap"><table><thead><tr><th class="l">종목</th><th class="l">구분/테마</th><th>계좌 내 비중</th><th>수익률</th></tr></thead><tbody>${a.holdings.map(h=>`<tr><td>${esc(h.name)}${h.code?`<span class="tag">${esc(h.code)}</span>`:''}${h.maturity?`<span class="tag">만기 ${h.maturity}</span>`:''}</td><td class="l ink2">${esc(h.theme)}</td><td class="num">${pct(h.w)}</td><td class="num ${sgn(h.ret)}">${h.ret==null?'-':pct(h.ret)}</td></tr>`).join('')}</tbody></table></div></div></details>`}).join('');
+drawTrend();
+</script>
+</body>
+</html>
